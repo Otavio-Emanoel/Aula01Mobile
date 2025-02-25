@@ -1,66 +1,168 @@
 <!DOCTYPE HTML>
-<html>
+<html lang="pt-br">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <meta http-equiv="Content-Security-Policy"
-        content="default-src * data: gap: content: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
-    <script src="cordova.js"></script>
-    <script src="components/loader.js"></script>
-    <link rel="stylesheet" href="components/loader.css">
-    <link rel="stylesheet" href="css/style.css">
-    
+    <title>Calculadora</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .calculator {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 320px;
+            padding: 20px;
+        }
+
+        #resultado {
+            font-size: 32px;
+            text-align: right;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #eee;
+            border-radius: 5px;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        input[type="button"] {
+            padding: 20px;
+            font-size: 24px;
+            border: none;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+
+        input[type="button"]:hover {
+            background-color: #ccc;
+        }
+
+        input[type="button"]:active {
+            background-color: #bbb;
+        }
+    </style>
 </head>
 
 <body>
-    <input type="number" name="" placeholder="Digite o valor 1" id="valor1">
-    <input type="number" name="" placeholder="Digite o valor 2" id="valor2">
-    <input type="button" value="SOMAR" id="soma" onclick="somar()">
-    <input type="button" value="SUBTRAIR" id="sub" onclick="subtrair()">
-    <input type="button" value="MULTIPLICAR" id="mult" onclick="multiplicar()">
-    <input type="button" value="DIVIDIR" id="div" onclick="dividir()">
-    <input type="button" value="EXPONENCIAÇÃO" id="expo" onclick="exponenciar()">
-    <h1 id="resultado"></h1>
+    <div class="calculator">
+        <div id="resultado">0</div>
+        <div class="buttons">
+            <input type="button" value="7" onclick="adicionarValor(7)">
+            <input type="button" value="8" onclick="adicionarValor(8)">
+            <input type="button" value="9" onclick="adicionarValor(9)">
+            <input type="button" value="C" onclick="limpar()">
+            <input type="button" value="4" onclick="adicionarValor(4)">
+            <input type="button" value="5" onclick="adicionarValor(5)">
+            <input type="button" value="6" onclick="adicionarValor(6)">
+            <input type="button" value="/" onclick="operacao('/')">
+            <input type="button" value="1" onclick="adicionarValor(1)">
+            <input type="button" value="2" onclick="adicionarValor(2)">
+            <input type="button" value="3" onclick="adicionarValor(3)">
+            <input type="button" value="*" onclick="operacao('*')">
+            <input type="button" value="0" onclick="adicionarValor(0)">
+            <input type="button" value="." onclick="adicionarPonto()">
+            <input type="button" value="=" onclick="calcular()">
+            <input type="button" value="-" onclick="operacao('-')">
+            <input type="button" value="+" onclick="operacao('+')">
+        </div>
+    </div>
 
     <script>
-        function somar() {
-            let num1 = Number(document.querySelector('#valor1').value)
-            let num2 = Number(document.querySelector('#valor2').value)
-            
-            let soma = num1 + num2
-            document.querySelector('.resultado').innerHTML = `${soma}`
-        }
-        function subtrair() {
-            let num1 = Number(document.querySelector('#valor1').value)
-            let num2 = Number(document.querySelector('#valor2').value)
-            let sub = num1 - num2
-            document.querySelector('.resultado').innerHTML = `${sub}`
-            
-        }
-        function dividir() {
-            let num1 = Number(document.querySelector('#valor1').value)
-            let num2 = Number(document.querySelector('#valor2').value)
-            let div = num1 / num2
-            document.querySelector('.resultado').innerHTML = `${div}`
-            
-        }
-        function multiplicar() {
-            let num1 = Number(document.querySelector('#valor1').value)
-            let num2 = Number(document.querySelector('#valor2').value)
-            let mult = num1 * num2
-            document.querySelector('.resultado').innerHTML = `${mult}`
-            
-        }
-        function exponenciar() {
-            let num1 = Number(document.querySelector('#valor1').value)
-            let num2 = Number(document.querySelector('#valor2').value)
-            let expo = num ** num2
-            document.querySelector('#resultado').innerHTML = `${expo}`
+        let valor1 = "";   // Parte 1 da operação
+        let valor2 = "";   // Parte 2 da operação
+        let operador = null; // Operação que será executada
 
+        function atualizarDisplay() {
+            // Exibe a operação em andamento
+            document.querySelector('#resultado').innerText = valor1 + (operador ? operador : '') + valor2 || '0';
         }
-        
 
+        function adicionarValor(valor) {
+            // Adiciona um número ao valor atual (valor1 ou valor2)
+            if (operador === null) {
+                valor1 += valor;
+            } else {
+                valor2 += valor;
+            }
+            atualizarDisplay();
+        }
+
+        function adicionarPonto() {
+            // Adiciona um ponto decimal se não houver já um ponto no valor
+            if (operador === null) {
+                if (!valor1.includes(".")) valor1 += ".";
+            } else {
+                if (!valor2.includes(".")) valor2 += ".";
+            }
+            atualizarDisplay();
+        }
+
+        function limpar() {
+            // Limpa os valores e o operador
+            valor1 = "";
+            valor2 = "";
+            operador = null;
+            atualizarDisplay();
+        }
+
+        function operacao(op) {
+            // Define a operação (soma, subtração, multiplicação ou divisão)
+            if (valor1 !== "") {
+                operador = op;
+            }
+            atualizarDisplay();
+        }
+
+        function calcular() {
+            // Realiza o cálculo com base nos valores e operação
+            if (valor1 !== "" && valor2 !== "" && operador !== null) {
+                let resultado;
+                let num1 = parseFloat(valor1);
+                let num2 = parseFloat(valor2);
+                switch (operador) {
+                    case "+":
+                        resultado = num1 + num2;
+                        break;
+                    case "-":
+                        resultado = num1 - num2;
+                        break;
+                    case "*":
+                        resultado = num1 * num2;
+                        break;
+                    case "/":
+                        if (num2 === 0) {
+                            resultado = "Erro: Divisão por zero!";
+                        } else {
+                            resultado = num1 / num2;
+                        }
+                        break;
+                    default:
+                        resultado = "Erro";
+                        break;
+                }
+                valor1 = resultado.toString();
+                valor2 = "";
+                operador = null;
+                document.querySelector('#resultado').innerText = valor1;
+            }
+        }
     </script>
 </body>
 
